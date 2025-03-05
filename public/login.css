@@ -1,0 +1,87 @@
+body {
+  background-color: #1e1f20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 0;
+}
+
+main {
+  background-color: #0e0e0e;
+  border-radius: 28px;
+  min-height: 384px;
+  color: #e3e3e3;
+  display: flex;
+  gap: 50px;
+  padding: 108px 36px 36px 36px;
+
+  & h1 {
+    font-weight: 400;
+  }
+}
+
+input {
+  background: inherit;
+  border: 1px solid #666866;
+  border-radius: 5px;
+  padding: 13px 15px;
+  width: 100%;
+  color: white;
+}
+
+input::placeholder {
+  color: #c4c7c5;
+}
+
+.right-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+#forgot-email-btn {
+  position: absolute;
+  left: -10px;
+  top: 50px;
+}
+
+#forgot-email-btn,
+#create-account-btn {
+  appearance: none;
+  border: none;
+  background-color: inherit;
+  color: #a8c7fa;
+  padding: 5px 10px;
+
+  &:hover {
+    background-color: #1a1d21;
+    border-radius: 35px / 100%;
+  }
+}
+
+button {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.btn-container {
+  margin-top: auto;
+  display: flex;
+  justify-content: end;
+  gap: 40px;
+}
+
+#next-btn {
+  color: #062e6f;
+  background-color: #a8c7fa;
+  border-radius: 35px / 100%;
+  border: none;
+  padding: 0px 24px;
+  height: 40px;
+  font-weight: 500;
+  cursor: pointer;
+}

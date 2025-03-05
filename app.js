@@ -1,24 +1,30 @@
+// Core modules
+const path = require("node:path");
+require("dotenv").config();
+
+// Third-party modules
 const express = require("express");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const path = require("node:path");
 const bcrypt = require("bcryptjs");
-require("dotenv").config();
+const expressSession = require("express-session");
+const { PrismaClient, Prisma } = require("@prisma/client");
+const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 
+// Local modules
+const pageRouter = require("./routes/pageRouter");
+
+// Initialize app
 const app = express();
+const prisma = new PrismaClient();
 const { PORT, SECRET } = process.env;
 
+// Set up views and static files
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-
 const publicPath = path.join(__dirname, "public");
 app.use(express.static(publicPath));
 app.use(express.json());
-
-const expressSession = require("express-session");
-const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
-const { PrismaClient, Prisma } = require("@prisma/client");
-const prisma = new PrismaClient();
 
 app.use(
   expressSession({
@@ -84,6 +90,8 @@ passport.deserializeUser(async (id, done) => {
     done(err);
   }
 });
+
+app.use("/", pageRouter);
 
 app.listen(PORT, () => {
   console.log(`Listening on Port ${PORT}`);
