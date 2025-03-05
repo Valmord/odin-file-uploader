@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/general.css" />
+    <link rel="stylesheet" href="/login.css" />
+    <script src="/js/login.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <div class="left-container">
+        <h1>Welcome</h1>
+        <button type="button" id="username-btn" data-username="<%= username %>">
+          <%= username %>
+        </button>
+      </div>
+      <div class="right-container">
+        <form action="login2" method="post">
+          <input
+          type="text"
+          name="password"
+          id="password"
+          placeholder="Enter your password"
+          minlength="8"
+          required
+        />
+        <label for="show-password" class="login-2-label">
+          <input type="checkbox" name="show-password" id="show-password" />
+          Show password
+        </label>
+        <button type="button" id="forgot-email-btn">Forgot email?</button>
+        <div class="btn-container">
+          <button type="button" id="forgot-password-btn">
+            Forgot password?
+          </button>
+          <button type="button" id="next-btn">Next</button>
+
+
+        </form>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

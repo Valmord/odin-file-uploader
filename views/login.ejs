@@ -6,6 +6,7 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/general.css" />
     <link rel="stylesheet" href="/login.css" />
+    <script src="/js/login.js" defer></script>
   </head>
   <body>
     <main>
@@ -14,19 +15,23 @@
         <p>To use my drive</p>
       </div>
       <div class="right-container">
-        <input
-          type="text"
-          name="username"
-          id="username"
-          placeholder="username"
-          minlength="8"
-          required
-        />
-        <button type="button" id="forgot-email-btn">Forgot email?</button>
-        <div class="btn-container">
-          <button type="button" id="create-account-btn">Create account</button>
-          <button type="button" id="next-btn">Next</button>
-        </div>
+        <form action="/login" method="post">
+          <input
+            type="text"
+            name="username"
+            id="username"
+            placeholder="username"
+            minlength="8"
+            required
+          />
+          <button type="button" id="forgot-email-btn">Forgot email?</button>
+          <div class="btn-container">
+            <button type="button" id="create-account-btn">
+              Create account
+            </button>
+            <button type="button" id="next-btn">Next</button>
+          </div>
+        </form>
       </div>
     </main>
   </body>

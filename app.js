@@ -16,7 +16,7 @@ const pageRouter = require("./routes/pageRouter");
 
 // Initialize app
 const app = express();
-const prisma = new PrismaClient();
+const prisma = require("./prisma");
 const { PORT, SECRET } = process.env;
 
 // Set up views and static files
