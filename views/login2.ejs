@@ -18,15 +18,21 @@
       </div>
       <div class="right-container">
         <form action="login2" method="post">
-          <input type="hidden" name="username" value="<%= username %>" aria-hidden="false">
+          <input type="hidden" name="username" value="<%= username || formData.username || '' %>" aria-hidden="false">
           <input
           type="text"
           name="password"
           id="password"
           placeholder="Enter your password"
           minlength="8"
+          value="<%= formData.password || '' %>"
           required
         />
+        <ul>
+          <% (errors.password || []).forEach( error => { %>
+          <li><%= error %></li>
+          <% }) %>
+        </ul>
         <label for="show-password" class="login-2-label">
           <input type="checkbox" name="show-password" id="show-password" />
           Show password

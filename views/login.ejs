@@ -22,8 +22,14 @@
             id="username"
             placeholder="username"
             minlength="8"
+            value="<%= formData.username || '' %>"
             required
           />
+          <ul>
+            <% (errors.username || []).forEach( error => { %>
+            <li><%= error %></li>
+            <% }) %>
+          </ul>
           <button type="button" id="forgot-email-btn">Forgot email?</button>
           <div class="btn-container">
             <button type="button" id="create-account-btn">

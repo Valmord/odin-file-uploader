@@ -16,7 +16,7 @@ const pageRouter = require("./routes/pageRouter");
 
 // Initialize app
 const app = express();
-const prisma = require("./prisma");
+const { prisma } = require("./prisma");
 const { PORT, SECRET } = process.env;
 
 // Set up views and static files
@@ -26,16 +26,32 @@ const publicPath = path.join(__dirname, "public");
 app.use(express.static(publicPath));
 app.use(express.json());
 
+// app.use(
+//   expressSession({
+//     secret: SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       maxAge: 1000 * 60 * 60,
+//     },
+//     store: new PrismaSessionStore(new PrismaClient(), {
+//       checkPeriod: 2 * 60 * 1000,
+//       dbRecordIdIsSessionId: true,
+//       dbRecordIdFunction: undefined,
+//     }),
+//   })
+// );
+
 app.use(
   expressSession({
+    cookie: {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // ms
+    },
     secret: SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60,
-    },
     store: new PrismaSessionStore(new PrismaClient(), {
-      checkPeriod: 2 * 60 * 1000,
+      checkPeriod: 2 * 60 * 1000, //ms
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),
@@ -49,19 +65,19 @@ passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
       console.log("inside strategy");
+
       const user = await prisma.user.findUnique({
-        where: {
-          username,
-        },
+        where: { username: username },
       });
-      // const so = await queries.getUserByUsername(username);
-      console.log(user);
+
       if (!user) {
         return done(null, false, { message: "Incorrect Username" });
       }
       console.log("User found, verifying password");
 
       const match = await bcrypt.compare(password, user.password);
+
+      console.log(match);
 
       if (!match) {
         return done(null, false, { message: "Incorrect password" });
@@ -81,7 +97,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await queries.getUserById(id);
+    const user = await prisma.user.findUnique({ where: { id } });
 
     if (user) {
       done(null, user);
