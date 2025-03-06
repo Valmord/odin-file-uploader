@@ -3,10 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const userInput = document.getElementById("username");
   const checkboxLbl = document.querySelector(".login-2-label");
   const checkbox = document.querySelector('input[type="checkbox"]');
+  const createAccBtn = document.getElementById("create-account-btn");
 
   if (checkboxLbl) {
     checkbox.addEventListener("change", () => {
       checkboxLbl.classList.toggle("active");
+    });
+  }
+
+  if (createAccBtn) {
+    createAccBtn.addEventListener("click", () => {
+      window.location.href = "/signup";
     });
   }
 

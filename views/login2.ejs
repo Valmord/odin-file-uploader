@@ -12,12 +12,13 @@
     <main>
       <div class="left-container">
         <h1>Welcome</h1>
-        <button type="button" id="username-btn" data-username="<%= username %>">
+        <button type="button" id="username-btn">
           <%= username %>
         </button>
       </div>
       <div class="right-container">
         <form action="login2" method="post">
+          <input type="hidden" name="username" value="<%= username %>" aria-hidden="false">
           <input
           type="text"
           name="password"
@@ -35,7 +36,7 @@
           <button type="button" id="forgot-password-btn">
             Forgot password?
           </button>
-          <button type="button" id="next-btn">Next</button>
+          <button type="submit" id="next-btn">Next</button>
 
 
         </form>
