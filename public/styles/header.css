@@ -3,7 +3,7 @@ header {
   background-color: var(--side-bgc);
   display: flex;
   align-items: center;
-  padding: 8px;
+  padding: 10px;
   position: relative;
 
   & h1 {

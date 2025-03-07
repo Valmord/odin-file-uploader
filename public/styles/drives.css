@@ -31,3 +31,25 @@
 .my-drive > p {
   margin: 10px 0px;
 }
+
+.item-option-container {
+  margin-left: auto;
+  margin-right: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  & img {
+    height: auto;
+    width: 26px;
+    opacity: 0.6;
+  }
+
+  .share-img {
+    width: 32px;
+  }
+}
+
+.item-option-container > img:hover {
+  opacity: 1;
+  cursor: pointer;
+}

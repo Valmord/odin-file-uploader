@@ -28,8 +28,22 @@ const postNewFile = [
   },
 ];
 
+async function downloadFile(req, res) {
+  console.log("Attempting to download file");
+
+  try {
+    const file = await query.downloadFile(+req.params.id, req.user.id);
+    res.download(`./uploads/${file.filename}`, file.originalName);
+  } catch (err) {
+    console.error("An error occured downloading file:", err);
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = {
   getHomepage,
 
   postNewFile,
+
+  downloadFile,
 };

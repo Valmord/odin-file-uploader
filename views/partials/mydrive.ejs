@@ -2,7 +2,15 @@
   <p>Name</p>
   <ul class="drive-container">
     <% (files || []).forEach( file => { %>
-    <li class="link-item"><%= file.originalName %></li>
+    <li class="link-item">
+      <%= file.originalName %>
+      <div class="item-option-container">
+        <a href="/file/download/<%= file.id %>"
+          ><img src="/images/download.svg" alt="download" class="download-img"
+        /></a>
+        <img src="/images/share-file.svg" alt="share" class="share-img" />
+      </div>
+    </li>
     <%}) %>
   </ul>
 </div>

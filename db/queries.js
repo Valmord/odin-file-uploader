@@ -34,10 +34,33 @@ async function getUserFiles(id) {
     },
     select: {
       originalName: true,
+      id: true,
     },
   });
   console.log(files);
   return files;
+}
+
+async function downloadFile(id, userId) {
+  console.log(`fileid: ${id}`, `userId: ${userId}`);
+
+  const file = await prisma.file.findUnique({
+    where: {
+      id,
+      userId,
+    },
+  });
+
+  console.log(file);
+
+  if (!file) {
+    console.log("in here");
+    throw new Error(
+      "File doesn't exist or user doesn't have permission to access"
+    );
+  }
+
+  return file;
 }
 
 module.exports = {
@@ -45,4 +68,5 @@ module.exports = {
   createUser,
   addNewFile,
   getUserFiles,
+  downloadFile,
 };
