@@ -90,7 +90,7 @@ const postLoginUser = [
         if (!acc[err.path]) acc[err.path] = [];
         acc[err.path] = err.msg;
         return acc;
-      }, acc);
+      }, {});
       return res.render("signup", {
         title: "Login Form",
         formData: req.body,
@@ -127,16 +127,20 @@ const postLoginPassword = [
   [body("password").trim().notEmpty().withMessage("Is a required field")],
   async (req, res, next) => {
     const errors = validationResult(req);
+    console.log(errors);
+
     if (!errors.isEmpty()) {
       const errorMap = errors.array().reduce((acc, err) => {
         if (!acc[err.path]) acc[err.path] = [];
         acc[err.path] = err.msg;
         return acc;
-      }, acc);
+      }, {});
+
       return res.render("signup2", {
         title: "Login password",
         formData: req.body,
         errors: errorMap,
+        username: req.body.username,
       });
     }
 
@@ -157,7 +161,8 @@ const postLoginPassword = [
         return res.render("login2", {
           title: "Login error",
           formData: req.body,
-          errors: { password: "Username or Password is invalid" },
+          errors: { password: ["Username or Password is invalid"] },
+          username: req.body.username,
         });
       }
 

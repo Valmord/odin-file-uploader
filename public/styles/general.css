@@ -9,6 +9,7 @@
 :root {
   font-family: "Roboto", sans-serif;
   font-size: 10px;
+  --side-bgc: #f8fafd;
 }
 
 main {

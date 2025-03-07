@@ -9,6 +9,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (checkboxLbl) {
     checkbox.addEventListener("change", () => {
       checkboxLbl.classList.toggle("active");
+      if (passwordInput.getAttribute("type") === "password") {
+        passwordInput.setAttribute("type", "text");
+      } else passwordInput.setAttribute("type", "password");
     });
   }
 

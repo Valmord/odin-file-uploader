@@ -1,0 +1,50 @@
+header {
+  grid-area: header;
+  background-color: var(--side-bgc);
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  position: relative;
+
+  & h1 {
+    font-size: 2.4rem;
+    color: #3f3f3f;
+    font-weight: 400;
+    margin-left: 30px;
+    margin-right: 125px;
+  }
+}
+
+.search-bar {
+  position: relative;
+  height: 100%;
+  min-width: 540px;
+  & img {
+    position: absolute;
+    left: 15px;
+    top: 10px;
+    height: auto;
+    width: 25px;
+  }
+  & input {
+    padding: 0 50px;
+    height: 100%;
+    width: 100%;
+    background-color: #e9eef6;
+    border: none;
+    border-radius: 25px / 100%;
+  }
+}
+
+.links-container {
+  margin-left: auto;
+  font-size: 1.6rem;
+  display: flex;
+  gap: 30px;
+  margin-right: 10px;
+
+  & a {
+    color: #3f3f3f;
+    text-decoration: none;
+  }
+}
