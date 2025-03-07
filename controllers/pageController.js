@@ -1,5 +1,7 @@
 const { body, validationResult } = require("express-validator");
 const { prisma } = require("../prisma");
+const multer = require("multer");
+const upload = multer({ dest: "uploads" });
 
 function getHomepage(req, res) {
   console.log(req.user);
@@ -9,6 +11,16 @@ function getHomepage(req, res) {
   res.render("index", { title: "Homepage", user: req.user.username });
 }
 
+const postNewFile = [
+  upload.single("file"),
+  (req, res, next) => {
+    console.log(req.file);
+    res.redirect("/");
+  },
+];
+
 module.exports = {
   getHomepage,
+
+  postNewFile,
 };

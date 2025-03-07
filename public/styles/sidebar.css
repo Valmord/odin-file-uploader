@@ -55,6 +55,7 @@
     width: 100%;
     background-color: inherit;
     font-size: 1.4rem;
+    font-weight: 600;
   }
 
   & button:hover:not(.active) {
@@ -71,4 +72,5 @@
 
 button.active {
   background-color: #c2e7ff;
+  color: #004a77;
 }

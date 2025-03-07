@@ -14,6 +14,6 @@ router.post("/signup", userController.postSignupPage);
 
 router.get("/logout", userController.getLogout);
 
-router.get("/test", (req, res) => res.send("noo"));
+router.post("/file/new", pageController.postNewFile);
 
 module.exports = router;

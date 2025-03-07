@@ -1,7 +1,7 @@
 const { body, validationResult } = require("express-validator");
 const passport = require("passport");
 const bcrypt = require("bcryptjs");
-const { prisma } = require("../prisma");
+const query = require("../db/queries");
 
 function getSignupPage(req, res) {
   if (req.user) {
@@ -23,9 +23,7 @@ const signupValidator = [
     .isLength({ min: 8 })
     .withMessage("Username must be 8 or more characters")
     .custom(async (value) => {
-      const user = await prisma.user.findUnique({
-        where: { username: value },
-      });
+      const user = await query.getUserByUsername(value);
       console.log(user);
       if (user) throw new Error("Username already registered");
     }),
