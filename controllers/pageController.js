@@ -40,10 +40,24 @@ async function downloadFile(req, res) {
   }
 }
 
+async function deleteFile(req, res) {
+  console.log("Attempting to delete file", req.params.id);
+
+  try {
+    await query.deleteFile(+req.params.id, req.user.id);
+    console.log("Successfully deleted file");
+    res.status(200).json({ message: "File sucessfully deleted" });
+  } catch (err) {
+    console.error(`An error occured deleting id ${req.params.id}`, err);
+    res.status(500).json({ message: err.message });
+  }
+}
+
 module.exports = {
   getHomepage,
 
   postNewFile,
 
   downloadFile,
+  deleteFile,
 };

@@ -16,5 +16,6 @@ router.get("/logout", userController.getLogout);
 
 router.post("/file/new", pageController.postNewFile);
 router.get("/file/download/:id", pageController.downloadFile);
+router.delete("/file/delete/:id", pageController.deleteFile);
 
 module.exports = router;

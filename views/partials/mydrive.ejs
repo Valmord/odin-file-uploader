@@ -4,11 +4,16 @@
     <% (files || []).forEach( file => { %>
     <li class="link-item">
       <%= file.originalName %>
-      <div class="item-option-container">
+      <div class="file-option-container">
+        <a href="/file/delete/<%= file.id %>">
+          <img src="/images/delete-file.svg" alt="delete" class="delete-file" />
+        </a>
         <a href="/file/download/<%= file.id %>"
-          ><img src="/images/download.svg" alt="download" class="download-img"
+          ><img src="/images/download.svg" alt="download" class="download-file"
         /></a>
-        <img src="/images/share-file.svg" alt="share" class="share-img" />
+        <a href="/file/share/">
+          <img src="/images/share-file.svg" alt="share" class="share-file" />
+        </a>
       </div>
     </li>
     <%}) %>

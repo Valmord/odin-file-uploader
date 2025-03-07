@@ -42,8 +42,6 @@ async function getUserFiles(id) {
 }
 
 async function downloadFile(id, userId) {
-  console.log(`fileid: ${id}`, `userId: ${userId}`);
-
   const file = await prisma.file.findUnique({
     where: {
       id,
@@ -54,7 +52,6 @@ async function downloadFile(id, userId) {
   console.log(file);
 
   if (!file) {
-    console.log("in here");
     throw new Error(
       "File doesn't exist or user doesn't have permission to access"
     );
@@ -63,10 +60,42 @@ async function downloadFile(id, userId) {
   return file;
 }
 
+async function deleteFile(id, userId) {
+  console.log(`fileid: ${id}`, `userId: ${userId}`);
+
+  const file = await prisma.file.findUnique({
+    where: {
+      id,
+      userId,
+    },
+  });
+
+  if (!file) {
+    throw new Error(
+      "File doesn't exist or user doesn't have permission to delete"
+    );
+  }
+
+  await prisma.$transaction([
+    prisma.file.delete({
+      where: {
+        id,
+        userId,
+      },
+    }),
+    prisma.sharedFile.deleteMany({
+      where: {
+        fileId: id,
+      },
+    }),
+  ]);
+}
+
 module.exports = {
   getUserByUsername,
   createUser,
   addNewFile,
   getUserFiles,
   downloadFile,
+  deleteFile,
 };
