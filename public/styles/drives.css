@@ -1,0 +1,33 @@
+.drive-container {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: 48px;
+  list-style: none;
+
+  & li {
+    position: relative;
+    border-top: 1px solid #cacaca;
+    border-bottom: 1px solid #cacaca;
+    padding-left: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  & li:hover {
+    background-color: #efefef;
+  }
+
+  & li::before {
+    margin-right: 20px;
+    content: "";
+    display: block;
+    background-image: url("/images/file.svg");
+    background-size: cover;
+    height: 30px;
+    width: 30px;
+  }
+}
+
+.my-drive > p {
+  margin: 10px 0px;
+}

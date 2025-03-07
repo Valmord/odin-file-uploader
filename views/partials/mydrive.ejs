@@ -1,0 +1,8 @@
+<div class="my-drive">
+  <p>Name</p>
+  <ul class="drive-container">
+    <% (files || []).forEach( file => { %>
+    <li class="link-item"><%= file.originalName %></li>
+    <%}) %>
+  </ul>
+</div>

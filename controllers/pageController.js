@@ -1,21 +1,30 @@
-const { body, validationResult } = require("express-validator");
-const { prisma } = require("../prisma");
 const multer = require("multer");
 const upload = multer({ dest: "uploads" });
+const query = require("../db/queries");
 
-function getHomepage(req, res) {
+async function getHomepage(req, res) {
   console.log(req.user);
   if (!req.user) {
     return res.redirect("login");
   }
-  res.render("index", { title: "Homepage", user: req.user.username });
+
+  const files = await query.getUserFiles(req.user.id);
+
+  res.render("index", { title: "Homepage", user: req.user.username, files });
 }
 
 const postNewFile = [
   upload.single("file"),
-  (req, res, next) => {
-    console.log(req.file);
-    res.redirect("/");
+  async (req, res, next) => {
+    try {
+      await query.addNewFile(req.file, req.user.id);
+      console.log("Succesfully added file");
+    } catch (err) {
+      console.error("Filed to add new file", err);
+    } finally {
+      console.log(req.file);
+      res.redirect("/");
+    }
   },
 ];
 

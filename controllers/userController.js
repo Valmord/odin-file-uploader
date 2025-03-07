@@ -59,12 +59,7 @@ const postSignupPage = [
     try {
       const { username, password } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await prisma.user.create({
-        data: {
-          username,
-          password: hashedPassword,
-        },
-      });
+      const user = await query.createUser(username, hashedPassword);
 
       console.log("Account Sucessfully created");
       return res.redirect("/login");
@@ -97,9 +92,7 @@ const postLoginUser = [
     }
 
     try {
-      const user = await prisma.user.findUnique({
-        where: { username: req.body.username },
-      });
+      const user = await query.getUserByUsername(req.body.username);
 
       if (!user) {
         return res.render("login", {

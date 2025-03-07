@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/styles/index.css" />
     <link rel="stylesheet" href="/styles/sidebar.css" />
     <link rel="stylesheet" href="/styles/header.css" />
+    <link rel="stylesheet" href="/styles/drives.css" />
     <script src="/js/sidebar.js" defer></script>
     <script src="/js/header.js" defer></script>
   </head>
@@ -15,7 +16,10 @@
     <div class="container">
       <%- include('./partials/header') %> <%- include('./partials/sidebar') %>
       <main>
-        <div class="content"></div>
+        <div class="content">
+          <h2>Welcome</h2>
+          <%- include('./partials/mydrive') %>
+        </div>
       </main>
     </div>
   </body>
