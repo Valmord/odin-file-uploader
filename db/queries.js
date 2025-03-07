@@ -60,6 +60,14 @@ async function downloadFile(id, userId) {
   return file;
 }
 
+async function getFilename(fileId) {
+  return await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+  });
+}
+
 async function deleteFile(id, userId) {
   console.log(`fileid: ${id}`, `userId: ${userId}`);
 
@@ -67,6 +75,9 @@ async function deleteFile(id, userId) {
     where: {
       id,
       userId,
+    },
+    select: {
+      filename: true,
     },
   });
 
@@ -98,4 +109,5 @@ module.exports = {
   getUserFiles,
   downloadFile,
   deleteFile,
+  getFilename,
 };

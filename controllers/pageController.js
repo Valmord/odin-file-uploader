@@ -1,6 +1,7 @@
 const multer = require("multer");
 const upload = multer({ dest: "uploads" });
 const query = require("../db/queries");
+const fs = require("fs/promises");
 
 async function getHomepage(req, res) {
   console.log(req.user);
@@ -31,8 +32,10 @@ const postNewFile = [
 async function downloadFile(req, res) {
   console.log("Attempting to download file");
 
+  const fileId = +req.params.id;
+
   try {
-    const file = await query.downloadFile(+req.params.id, req.user.id);
+    const file = await query.downloadFile(fileId, req.user.id);
     res.download(`./uploads/${file.filename}`, file.originalName);
   } catch (err) {
     console.error("An error occured downloading file:", err);
@@ -41,10 +44,20 @@ async function downloadFile(req, res) {
 }
 
 async function deleteFile(req, res) {
-  console.log("Attempting to delete file", req.params.id);
+  const fileId = +req.params.id;
+
+  console.log("Attempting to delete file", fileId);
+
+  const deleteFile = async (fileName) => {
+    const path = `./uploads/${fileName}`;
+    console.log(path);
+    await fs.rm(path);
+  };
 
   try {
+    const filepath = await query.getFilename(fileId);
     await query.deleteFile(+req.params.id, req.user.id);
+    await deleteFile(filepath.filename);
     console.log("Successfully deleted file");
     res.status(200).json({ message: "File sucessfully deleted" });
   } catch (err) {
