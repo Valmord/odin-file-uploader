@@ -1,4 +1,5 @@
 const { prisma } = require("../prisma");
+const fs = require("fs/promises");
 
 async function getUserByUsername(value) {
   return await prisma.user.findUnique({
@@ -27,6 +28,23 @@ async function addNewFile({ originalname, filename }, userId) {
   });
 }
 
+async function appendFileSize(files) {
+  const updatedFiles = await Promise.all(
+    files.map(async (file) => {
+      const fileStats = await fs.stat(`./uploads/${file.filename}`);
+      const fileSize =
+        fileStats.size > 1_000_000
+          ? (fileStats.size / 10000000).toFixed(2) + " mb"
+          : (fileStats.size / 1000).toFixed(2) + " kb";
+      return {
+        ...file,
+        fileSize,
+      };
+    })
+  );
+  return updatedFiles;
+}
+
 async function getUserFiles(id) {
   const files = await prisma.file.findMany({
     where: {
@@ -34,11 +52,13 @@ async function getUserFiles(id) {
     },
     select: {
       originalName: true,
+      filename: true,
       id: true,
     },
   });
+
   console.log(files);
-  return files;
+  return await appendFileSize(files);
 }
 
 async function getUserSharedFiles(id) {
@@ -50,6 +70,7 @@ async function getUserSharedFiles(id) {
       file: {
         select: {
           originalName: true,
+          filename: true,
           id: true,
         },
       },
@@ -64,7 +85,7 @@ async function getUserSharedFiles(id) {
   console.log("mapped files");
   console.log(mappedFiles);
 
-  return mappedFiles;
+  return await appendFileSize(mappedFiles);
 }
 
 async function downloadFile(id, userId) {

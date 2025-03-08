@@ -28,12 +28,32 @@
   }
 }
 
-.my-drive > p {
-  margin: 10px 0px;
+.drive-headers {
+  margin: 15px 0px 10px;
+  display: flex;
+  padding-left: 70px;
+  padding-right: 40px;
+
+  & span {
+    font-weight: bold;
+  }
+
+  & span:nth-last-child(2) {
+    margin-left: auto;
+    margin-right: 50px;
+  }
+}
+
+.file-details {
+  flex: 1;
+  display: flex;
+  margin-right: 20px;
+  justify-content: space-between;
 }
 
 .file-option-container {
-  margin-left: auto;
+  flex: 0 0 100px;
+  width: 100px;
   margin-right: 20px;
   display: flex;
   gap: 10px;
@@ -55,6 +75,10 @@
   .share-file {
     width: 32px;
   }
+}
+
+.file-option-container.shared {
+  padding-left: 15px;
 }
 
 .file-option-container > img:hover {
@@ -148,4 +172,22 @@ button[type="submit"],
 
 #close-modal-btn {
   right: 20px;
+}
+
+#public-form {
+  & label {
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  & input {
+    position: absolute;
+    top: 4px;
+    left: 75px;
+    height: 1.6rem;
+  }
+
+  & hr {
+    margin: 10px 0;
+  }
 }

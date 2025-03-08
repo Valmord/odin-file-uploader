@@ -1,9 +1,16 @@
 <div class="my-drive">
-  <p>Name</p>
+  <div class="drive-headers">
+    <span>Name</span>
+    <span>Size</span>
+    <span>Options</span>
+  </div>
   <ul class="drive-container">
     <% (files || []).forEach( file => { %>
     <li class="link-item">
-      <%= file.originalName %>
+      <div class="file-details">
+        <span><%= file.originalName %></span>
+        <span> <%= file.fileSize %></span>
+      </div>
       <div class="file-option-container">
         <a href="/file/delete/<%= file.id %>">
           <img src="/images/delete-file.svg" alt="delete" class="delete-file" />
