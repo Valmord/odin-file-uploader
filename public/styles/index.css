@@ -21,3 +21,8 @@ main {
   background-color: white;
   padding: 20px;
 }
+
+.no-files {
+  margin-top: 20px;
+  margin-left: 10px;
+}

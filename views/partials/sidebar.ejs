@@ -2,11 +2,17 @@
   <button id="new-file-btn">New</button>
 
   <div class="btn-grp">
-    <button id="my-files-btn" class="active">
+    <button
+      id="my-files-btn"
+      class="<%= activePage === 'index' ? 'active' : '' %>"
+    >
       <img src="/images/home2.svg" alt="" />
       My files
     </button>
-    <button id="shared-files-btn">
+    <button
+      id="shared-files-btn"
+      class="<%= activePage === 'shares' ? 'active' : '' %>"
+    >
       <img src="/images/share.svg" alt="" />
       Shared with me
     </button>

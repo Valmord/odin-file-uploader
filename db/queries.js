@@ -41,6 +41,32 @@ async function getUserFiles(id) {
   return files;
 }
 
+async function getUserSharedFiles(id) {
+  const files = await prisma.sharedFile.findMany({
+    where: {
+      userId: id,
+    },
+    select: {
+      file: {
+        select: {
+          originalName: true,
+          id: true,
+        },
+      },
+    },
+  });
+
+  const mappedFiles = files.reduce((acc, cur) => {
+    acc.push(cur.file);
+    return acc;
+  }, []);
+
+  console.log("mapped files");
+  console.log(mappedFiles);
+
+  return mappedFiles;
+}
+
 async function downloadFile(id, userId) {
   const file = await prisma.file.findUnique({
     where: {
@@ -58,6 +84,28 @@ async function downloadFile(id, userId) {
   }
 
   return file;
+}
+
+async function downloadSharedFile(fileId, userId) {
+  const sharedFile = await prisma.sharedFile.findFirst({
+    where: {
+      fileId,
+      userId,
+    },
+    select: {
+      file: true,
+    },
+  });
+
+  console.log(sharedFile);
+
+  if (!sharedFile) {
+    throw new Error(
+      "File doesn't exist or user doesn't have permission to access"
+    );
+  }
+
+  return sharedFile.file;
 }
 
 async function getFilename(fileId) {
@@ -102,12 +150,85 @@ async function deleteFile(id, userId) {
   ]);
 }
 
+async function getSharedFileInfo(fileId, userId) {
+  console.log(fileId, userId, "IDS HERE");
+
+  const file = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+      userId,
+    },
+  });
+
+  if (!file) throw new Error("File doesn't exist or invalid permissions");
+
+  const sharedInfo = await prisma.sharedFile.findMany({
+    where: {
+      fileId,
+    },
+  });
+
+  return sharedInfo;
+}
+
+async function postShareWithUser(sharedUsername, fileId, userId) {
+  console.log(" ");
+  console.log(sharedUsername, fileId, userId);
+  console.log(" ");
+
+  const validUser = await prisma.user.findUnique({
+    where: {
+      username: sharedUsername,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!validUser) throw new Error("Invalid username, try another");
+
+  const validRequest = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+      userId,
+    },
+  });
+
+  if (!validRequest)
+    throw new Error("Invalid file or user invalid permissions");
+
+  const userAlreadySharedWith = await prisma.sharedFile.findFirst({
+    where: {
+      fileId,
+      userId: validUser.id,
+    },
+  });
+
+  if (userAlreadySharedWith)
+    throw new Error(`File already shared with ${sharedUsername}`);
+
+  if (userId === validUser.id)
+    throw new Error("You can't share a file with yourself...");
+
+  await prisma.sharedFile.create({
+    data: {
+      fileId,
+      userId: validUser.id,
+    },
+  });
+}
+
 module.exports = {
   getUserByUsername,
   createUser,
   addNewFile,
   getUserFiles,
+  getUserSharedFiles,
   downloadFile,
+  downloadSharedFile,
   deleteFile,
   getFilename,
+
+  getSharedFileInfo,
+  postShareWithUser,
 };

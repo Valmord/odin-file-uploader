@@ -1,0 +1,40 @@
+<dialog class="share-file-modal">
+  <h2>Share a file</h2>
+  <div class="tabs">
+    <button type="button" id="share-tab-btn" class="tab active">
+      Share with
+    </button>
+    <button type="button" id="public-tab-btn" class="tab">Make Public</button>
+  </div>
+  <div class="form-container">
+    <form action="file/share" method="post" id="share-form">
+      <label for="username">Username</label>
+      <input type="text" name="username" id="username" />
+      <p>Currently shared with:</p>
+      <ol class="current-shares">
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+        <li>Empty</li>
+      </ol>
+      <button type="submit">Click to Share</button>
+    </form>
+    <form action="file/public" method="post" id="public-form" class="hidden">
+      <label for="public">Make Public</label>
+      <input type="checkbox" />
+      <hr />
+      <p>Shared Link:</p>
+      <a href="">Shared Link</a>
+    </form>
+    <button id="close-modal-btn">Exit Modal</button>
+  </div>
+</dialog>

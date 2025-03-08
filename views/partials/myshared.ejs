@@ -1,0 +1,15 @@
+<div class="my-drive">
+  <p>Name</p>
+  <ul class="drive-container">
+    <% (shares || []).forEach( file => { %>
+    <li class="link-item">
+      <%= file.originalName %>
+      <div class="file-option-container">
+        <a href="/share/download/<%= file.id %>"
+          ><img src="/images/download.svg" alt="download" class="download-file"
+        /></a>
+      </div>
+    </li>
+    <%}) %>
+  </ul>
+</div>

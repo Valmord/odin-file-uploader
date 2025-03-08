@@ -19,9 +19,15 @@
       <main>
         <div class="content">
           <h2>Welcome</h2>
-          <%- include('./partials/mydrive') %>
+          <% if ( activePage === 'index' && files.length) { %> <%-
+          include('./partials/mydrive') %> <% } else if ( activePage ===
+          'shares' && shares.length ) { %> <%-
+          include('./partials/myshared.ejs') %> <% } else { %>
+          <h3 class="no-files">No Files Yet :)</h3>
+          <% } %>
         </div>
       </main>
+      <%- include('./partials/modal-share') %>
     </div>
   </body>
 </html>
