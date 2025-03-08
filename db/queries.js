@@ -159,7 +159,16 @@ async function getSharedFileInfo(fileId, userId) {
     where: {
       fileId,
     },
+    select: {
+      user: {
+        select: {
+          username: true,
+        },
+      },
+    },
   });
+
+  console.log("shared info", sharedInfo);
 
   return sharedInfo;
 }

@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const shareBtns = document.querySelectorAll(".share-file");
     const shareForm = document.getElementById("share-form");
     const publicForm = document.getElementById("public-form");
+    const currentShares = document.querySelector(".current-shares");
 
     // Populate and open modal
 
@@ -49,9 +50,20 @@ document.addEventListener("DOMContentLoaded", () => {
             },
           });
 
+          console.log(response);
+
           if (response.ok) {
             const data = await response.json();
+            console.log("data..");
             console.log(data);
+
+            // Clear out
+            if (data.sharedInfo.length) currentShares.textContent = "";
+            data.sharedInfo.forEach((share) => {
+              const li = document.createElement("li");
+              li.textContent = share.user.username;
+              currentShares.appendChild(li);
+            });
 
             shareForm.dataset.id = fileId;
             publicForm.dataset.id = fileId;
@@ -115,9 +127,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (response.ok) {
         console.log(data);
+        const li = document.createElement("li");
+        li.textContent = shareInput.value;
+        currentShares.appendChild(li);
       } else {
         alert(data.error);
       }
+
+      shareInput.value = "";
     });
 
     const unshareBtns = document.querySelectorAll(".unshare-shared-file");
