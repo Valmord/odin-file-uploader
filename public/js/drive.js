@@ -119,5 +119,30 @@ document.addEventListener("DOMContentLoaded", () => {
         alert(data.error);
       }
     });
+
+    const unshareBtns = document.querySelectorAll(".unshare-shared-file");
+
+    unshareBtns.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        const confirmation = confirm(
+          "Are you sure you no longer need this file?"
+        );
+
+        if (!confirmation) return;
+
+        const response = await fetch(btn.parentNode.href, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          window.location.reload();
+        } else alert("Failed to remove file");
+      });
+    });
   }
 });

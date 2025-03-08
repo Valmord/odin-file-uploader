@@ -134,6 +134,19 @@ async function postShareWithUser(req, res) {
   }
 }
 
+async function unshareShare(req, res) {
+  const fileId = +req.params.id;
+  const userId = req.user.id;
+
+  try {
+    await query.putUnlinkSharedFile(fileId, userId);
+    res.status(200).json({ message: "Sucessfully unlinked file" });
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ error: err });
+  }
+}
+
 module.exports = {
   getHomepage,
   getSharedPage,
@@ -146,4 +159,6 @@ module.exports = {
 
   getSharedFileInfo,
   postShareWithUser,
+
+  unshareShare,
 };

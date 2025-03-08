@@ -142,10 +142,10 @@ button[type="submit"],
   padding: 5px 10px;
   border: 2px solid black;
   border-radius: 8px;
+  position: absolute;
+  bottom: 12px;
 }
 
 #close-modal-btn {
-  position: absolute;
-  bottom: 12px;
   right: 20px;
 }

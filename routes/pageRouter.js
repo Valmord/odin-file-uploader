@@ -19,6 +19,7 @@ router.post("/file/new", pageController.postNewFile);
 router.get("/file/download/:id", pageController.downloadFile);
 router.delete("/file/delete/:id", pageController.deleteFile);
 router.get("/share/download/:id", pageController.downloadShare);
+router.put("/share/unshare/:id", pageController.unshareShare);
 
 router.get("/file/share/:id", pageController.getSharedFileInfo);
 router.post("/file/share", pageController.postShareWithUser);

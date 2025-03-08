@@ -135,19 +135,12 @@ async function deleteFile(id, userId) {
     );
   }
 
-  await prisma.$transaction([
-    prisma.file.delete({
-      where: {
-        id,
-        userId,
-      },
-    }),
-    prisma.sharedFile.deleteMany({
-      where: {
-        fileId: id,
-      },
-    }),
-  ]);
+  await prisma.file.delete({
+    where: {
+      id,
+      userId,
+    },
+  });
 }
 
 async function getSharedFileInfo(fileId, userId) {
@@ -218,6 +211,31 @@ async function postShareWithUser(sharedUsername, fileId, userId) {
   });
 }
 
+// From the Shared User
+async function putUnlinkSharedFile(fileId, userId) {
+  console.log("in here with", fileId, userId);
+
+  const fileShared = await prisma.sharedFile.findFirst({
+    where: {
+      fileId,
+      userId,
+    },
+  });
+
+  console.log(fileShared);
+
+  if (!fileShared) throw new Error("File doesn't exist");
+
+  await prisma.sharedFile.delete({
+    where: {
+      fileId_userId: {
+        fileId,
+        userId,
+      },
+    },
+  });
+}
+
 module.exports = {
   getUserByUsername,
   createUser,
@@ -231,4 +249,6 @@ module.exports = {
 
   getSharedFileInfo,
   postShareWithUser,
+
+  putUnlinkSharedFile,
 };
