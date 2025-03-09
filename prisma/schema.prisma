@@ -19,6 +19,7 @@ model User {
   password    String
   files       File[]
   sharedFiles SharedFile[] 
+  folders Folder[]
 }
 
 model File {
@@ -29,6 +30,8 @@ model File {
   shareId      String? @unique @default(uuid())
   user         User    @relation(fields: [userId], references: [id])
   userId       Int
+  folder Folder? @relation("FolderFiles", fields: [folderId], references: [id], onDelete: Cascade)
+  folderId Int?
 
   sharedWith SharedFile[]
 }
@@ -40,6 +43,18 @@ model SharedFile {
   userId Int
 
   @@id([fileId, userId])
+}
+
+model Folder {
+  id Int @id @unique @default(autoincrement())
+  folderName String
+  parentFolderId Int?
+  userId Int 
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent Folder? @relation("ParentChild", fields: [parentFolderId], references: [id])
+  children Folder[] @relation("ParentChild")
+  files File[] @relation("FolderFiles")
 }
 
 model Session {

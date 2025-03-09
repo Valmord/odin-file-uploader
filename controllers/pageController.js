@@ -140,10 +140,49 @@ async function unshareShare(req, res) {
 
   try {
     await query.putUnlinkSharedFile(fileId, userId);
-    res.status(200).json({ message: "Sucessfully unlinked file" });
+    res.status(200).json({ message: "Successfully unlinked file" });
   } catch (err) {
     console.log(err);
     res.status(404).json({ error: err });
+  }
+}
+
+async function putPublicFileShare(req, res) {
+  const fileId = +req.body.fileId;
+  const userId = req.user.id;
+
+  try {
+    const link = await query.updatePublicLink(fileId, userId);
+    res.json({ link });
+  } catch (error) {
+    console.error(`Error updating file ${fileId}`, error);
+    res.status(404).json({ error });
+  }
+}
+
+async function getPublicFileshare(req, res) {
+  const shareId = req.params.id;
+  console.log(shareId);
+
+  try {
+    const shared = await query.getPublicShare(shareId);
+    console.log(shared);
+    res.render("public-share", { title: "Download file", ...shared });
+  } catch (error) {
+    console.error("In error occurred getting Public Fileshare", error);
+    res.status(404).json({ error });
+  }
+}
+
+async function getPublicFileDownload(req, res) {
+  const shareId = req.params.id;
+
+  try {
+    const file = await query.getPublicShare(shareId);
+    res.download(`./uploads/${file.filename}`, file.originalName);
+  } catch (error) {
+    console.error("Error downloading file", shareId);
+    res.status(404).json({ error });
   }
 }
 
@@ -161,4 +200,7 @@ module.exports = {
   postShareWithUser,
 
   unshareShare,
+  putPublicFileShare,
+  getPublicFileshare,
+  getPublicFileDownload,
 };

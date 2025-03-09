@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const shareForm = document.getElementById("share-form");
     const publicForm = document.getElementById("public-form");
     const currentShares = document.querySelector(".current-shares");
+    const pubCheckbox = document.querySelector('input[type="checkbox"]');
+    const sharedLink = document.querySelector(".shared-link");
 
     // Populate and open modal
 
@@ -54,16 +56,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (response.ok) {
             const data = await response.json();
+
+            if (data.length === 0) {
+              modal.showModal();
+              return;
+            }
             console.log("data..");
             console.log(data);
+            console.log(data.sharedInfo.sharedWith);
 
             // Clear out
-            if (data.sharedInfo.length) currentShares.textContent = "";
-            data.sharedInfo.forEach((share) => {
+            if (data.sharedInfo.sharedWith.length)
+              currentShares.textContent = "";
+            data.sharedInfo.sharedWith.forEach((share) => {
+              console.log(share);
               const li = document.createElement("li");
               li.textContent = share.user.username;
               currentShares.appendChild(li);
             });
+
+            const isPublic = data.sharedInfo?.isPublic || false;
+            pubCheckbox.checked = isPublic;
+            if (isPublic) sharedLink.classList.remove("hidden");
+            else sharedLink.classList.add("hidden");
+
+            const shareId = data.sharedInfo?.shareId;
+            sharedLink.querySelector("a").href = `/file/public/${shareId}`;
 
             shareForm.dataset.id = fileId;
             publicForm.dataset.id = fileId;
@@ -160,6 +178,28 @@ document.addEventListener("DOMContentLoaded", () => {
           window.location.reload();
         } else alert("Failed to remove file");
       });
+    });
+
+    pubCheckbox.addEventListener("change", async () => {
+      const response = await fetch("/file/public", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileId: +publicForm.dataset.id,
+        }),
+      });
+
+      if (response.ok) {
+        const link = sharedLink.querySelector("a");
+        const data = await response.json();
+        link.href = `/file/shared/${data.link}/`;
+
+        console.log(data);
+      }
+
+      sharedLink.classList.toggle("hidden");
     });
   }
 });

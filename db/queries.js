@@ -28,7 +28,7 @@ async function addNewFile({ originalname, filename }, userId) {
   });
 }
 
-async function appendFileSize(files) {
+async function appendFileSizeArray(files) {
   const updatedFiles = await Promise.all(
     files.map(async (file) => {
       const fileStats = await fs.stat(`./uploads/${file.filename}`);
@@ -45,6 +45,18 @@ async function appendFileSize(files) {
   return updatedFiles;
 }
 
+async function appendFileSizeSingleObj(file) {
+  const fileStats = await fs.stat(`./uploads/${file.filename}`);
+  const fileSize =
+    fileStats.size > 1_000_000
+      ? (fileStats.size / 10000000).toFixed(2) + " mb"
+      : (fileStats.size / 1000).toFixed(2) + " kb";
+  return {
+    ...file,
+    fileSize,
+  };
+}
+
 async function getUserFiles(id) {
   const files = await prisma.file.findMany({
     where: {
@@ -55,10 +67,13 @@ async function getUserFiles(id) {
       filename: true,
       id: true,
     },
+    orderBy: {
+      id: "asc",
+    },
   });
 
   console.log(files);
-  return await appendFileSize(files);
+  return await appendFileSizeArray(files);
 }
 
 async function getUserSharedFiles(id) {
@@ -75,6 +90,9 @@ async function getUserSharedFiles(id) {
         },
       },
     },
+    orderBy: {
+      fileId: "asc",
+    },
   });
 
   const mappedFiles = files.reduce((acc, cur) => {
@@ -85,7 +103,7 @@ async function getUserSharedFiles(id) {
   console.log("mapped files");
   console.log(mappedFiles);
 
-  return await appendFileSize(mappedFiles);
+  return await appendFileSizeArray(mappedFiles);
 }
 
 async function downloadFile(id, userId) {
@@ -176,20 +194,26 @@ async function getSharedFileInfo(fileId, userId) {
 
   if (!file) throw new Error("File doesn't exist or invalid permissions");
 
-  const sharedInfo = await prisma.sharedFile.findMany({
+  const sharedInfo = await prisma.file.findUnique({
     where: {
-      fileId,
+      id: fileId,
     },
     select: {
-      user: {
+      isPublic: true,
+      shareId: true,
+      sharedWith: {
         select: {
-          username: true,
+          user: {
+            select: {
+              username: true,
+            },
+          },
         },
       },
     },
   });
 
-  console.log("shared info", sharedInfo);
+  console.log(JSON.stringify(sharedInfo));
 
   return sharedInfo;
 }
@@ -266,6 +290,54 @@ async function putUnlinkSharedFile(fileId, userId) {
   });
 }
 
+async function updatePublicLink(fileId, userId) {
+  console.log(fileId, userId);
+  const validUser = await prisma.file.findUnique({
+    where: {
+      id: fileId,
+      userId,
+    },
+    select: {
+      shareId: true,
+      isPublic: true,
+    },
+  });
+
+  if (!validUser) throw new Error("Invalid File or User");
+
+  await prisma.file.update({
+    where: {
+      id: fileId,
+      userId,
+    },
+    data: {
+      isPublic: !validUser.isPublic,
+    },
+  });
+
+  return validUser.shareId;
+}
+
+async function getPublicShare(shareId) {
+  const share = await prisma.file.findUnique({
+    where: {
+      shareId,
+    },
+    select: {
+      originalName: true,
+      filename: true,
+      shareId: true,
+    },
+  });
+
+  if (!share) throw new Error("Invalid share id");
+
+  const shareWithSize = await appendFileSizeSingleObj(share);
+  console.log(shareWithSize);
+
+  return shareWithSize;
+}
+
 module.exports = {
   getUserByUsername,
   createUser,
@@ -281,4 +353,7 @@ module.exports = {
   postShareWithUser,
 
   putUnlinkSharedFile,
+  updatePublicLink,
+
+  getPublicShare,
 };

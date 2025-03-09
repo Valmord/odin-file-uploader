@@ -23,5 +23,8 @@ router.put("/share/unshare/:id", pageController.unshareShare);
 
 router.get("/file/share/:id", pageController.getSharedFileInfo);
 router.post("/file/share", pageController.postShareWithUser);
+router.put("/file/public", pageController.putPublicFileShare);
+router.get("/file/public/:id", pageController.getPublicFileshare);
+router.get("/file/public/download/:id", pageController.getPublicFileDownload);
 
 module.exports = router;
