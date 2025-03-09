@@ -8,7 +8,11 @@
     <% (folders || []).forEach( folder => { %>
     <li class="link-folder">
       <div class="file-details">
-        <span><%= folder.folderName %></span>
+        <span
+          ><a href="folder/<%= folder.folderName %>"
+            ><%= folder.folderName %></a
+          ></span
+        >
       </div>
     </li>
     <% } ) %> <% (files || []).forEach( file => { %>

@@ -34,10 +34,16 @@ document.addEventListener("DOMContentLoaded", () => {
       input.type = "file";
       input.name = "file";
       input.click();
+
+      const action =
+        window.location.pathname === "/"
+          ? "/file/new"
+          : window.location.pathname;
+
       input.addEventListener("change", () => {
         if (input.files.length > 0) {
           const form = document.createElement("form");
-          form.action = "/file/new";
+          form.action = action;
           form.method = "post";
           form.enctype = "multipart/form-data";
           form.appendChild(input);

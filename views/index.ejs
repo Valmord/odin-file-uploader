@@ -18,7 +18,7 @@
       <%- include('./partials/header') %> <%- include('./partials/sidebar') %>
       <main>
         <div class="content">
-          <h2>Welcome</h2>
+          <h2><%= title %></h2>
           <% if ( activePage === 'index' && files.length) { %> <%-
           include('./partials/mydrive') %> <% } else if ( activePage ===
           'shares' && shares.length ) { %> <%-

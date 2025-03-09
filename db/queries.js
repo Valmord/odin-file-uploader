@@ -28,6 +28,46 @@ async function addNewFile({ originalname, filename }, userId) {
   });
 }
 
+async function getFolderFromPath(userId, urlPath) {
+  const folders = urlPath.split("/");
+
+  let parentFolderId = null;
+  let curFolder = null;
+  for (const folder of folders) {
+    if (folder === "") break;
+    const f = await prisma.folder.findFirst({
+      where: {
+        userId,
+        folderName: folder,
+        parentFolderId,
+      },
+    });
+
+    if (!f) throw new Error("Invalid folder");
+
+    parentFolderId = f.id;
+    curFolder = f;
+  }
+
+  return { folderId: curFolder.id, folderName: curFolder.folderName };
+}
+
+async function addNewFileToFolder({ originalname, filename }, userId, urlPath) {
+  const { folderId } = await getFolderFromPath(userId, urlPath);
+
+  console.log("FOLDER ID");
+  console.log(folderId);
+
+  await prisma.file.create({
+    data: {
+      originalName: originalname,
+      filename,
+      userId,
+      folderId,
+    },
+  });
+}
+
 async function appendFileSizeArray(files) {
   const updatedFiles = await Promise.all(
     files.map(async (file) => {
@@ -57,7 +97,7 @@ async function appendFileSizeSingleObj(file) {
   };
 }
 
-async function getUserFolders(userId) {
+async function getHomepageFolders(userId) {
   const folders = await prisma.folder.findMany({
     where: {
       userId,
@@ -88,7 +128,6 @@ async function getUserFiles(id) {
     },
   });
 
-  console.log(files);
   return await appendFileSizeArray(files);
 }
 
@@ -116,9 +155,6 @@ async function getUserSharedFiles(id) {
     return acc;
   }, []);
 
-  console.log("mapped files");
-  console.log(mappedFiles);
-
   return await appendFileSizeArray(mappedFiles);
 }
 
@@ -129,8 +165,6 @@ async function downloadFile(id, userId) {
       userId,
     },
   });
-
-  console.log(file);
 
   if (!file) {
     throw new Error(
@@ -152,8 +186,6 @@ async function downloadSharedFile(fileId, userId) {
     },
   });
 
-  console.log(sharedFile);
-
   if (!sharedFile) {
     throw new Error(
       "File doesn't exist or user doesn't have permission to access"
@@ -172,8 +204,6 @@ async function getFilename(fileId) {
 }
 
 async function deleteFile(id, userId) {
-  console.log(`fileid: ${id}`, `userId: ${userId}`);
-
   const file = await prisma.file.findUnique({
     where: {
       id,
@@ -199,8 +229,6 @@ async function deleteFile(id, userId) {
 }
 
 async function getSharedFileInfo(fileId, userId) {
-  console.log(fileId, userId, "IDS HERE");
-
   const file = await prisma.file.findUnique({
     where: {
       id: fileId,
@@ -229,16 +257,10 @@ async function getSharedFileInfo(fileId, userId) {
     },
   });
 
-  console.log(JSON.stringify(sharedInfo));
-
   return sharedInfo;
 }
 
 async function postShareWithUser(sharedUsername, fileId, userId) {
-  console.log(" ");
-  console.log(sharedUsername, fileId, userId);
-  console.log(" ");
-
   const validUser = await prisma.user.findUnique({
     where: {
       username: sharedUsername,
@@ -367,11 +389,43 @@ async function createFolder(userId, folderName, parentFolder) {
   return folder;
 }
 
+async function getUserFolder(userId, urlPath) {
+  const { folderId, folderName } = await getFolderFromPath(userId, urlPath);
+
+  const folderContents = await prisma.folder.findMany({
+    where: {
+      userId,
+      id: folderId,
+    },
+    select: {
+      files: true,
+    },
+  });
+
+  const otherFolders = await prisma.folder.findMany({
+    where: {
+      userId,
+      parentFolderId: folderId,
+    },
+  });
+
+  const files = await appendFileSizeArray(folderContents[0].files);
+
+  return {
+    files,
+    folders: otherFolders,
+    currentFolder: folderName,
+  };
+}
+
 module.exports = {
   getUserByUsername,
   createUser,
+
   addNewFile,
-  getUserFolders,
+  addNewFileToFolder,
+
+  getHomepageFolders,
   getUserFiles,
   getUserSharedFiles,
   downloadFile,
@@ -387,4 +441,5 @@ module.exports = {
   getPublicShare,
 
   createFolder,
+  getUserFolder,
 };

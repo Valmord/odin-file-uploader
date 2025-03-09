@@ -13,7 +13,7 @@ async function getHomepage(req, res) {
   const userId = +req.user.id;
 
   try {
-    const folders = await query.getUserFolders(userId);
+    const folders = await query.getHomepageFolders(userId);
     const files = await query.getUserFiles(userId);
     res.render("index", {
       title: "Homepage",
@@ -25,6 +25,38 @@ async function getHomepage(req, res) {
     });
   } catch (error) {
     console.error("Error rendering home page", error);
+    res.status(404).json({ error });
+  }
+}
+
+async function getHomePageFolder(req, res) {
+  if (!req.user) {
+    return res.redirect("login");
+  }
+
+  console.log(req.params);
+
+  // const path = req.params
+
+  const userId = +req.user.id;
+  const url = req.params[0];
+
+  try {
+    const { files, folders, currentFolder } = await query.getUserFolder(
+      userId,
+      url
+    );
+    // console.log(folderData);
+    res.render("index", {
+      title: currentFolder,
+      user: req.user.username,
+      folders,
+      files,
+      shares: [],
+      activePage: "index",
+    });
+  } catch (error) {
+    console.error("Error getting folders for home page", error);
     res.status(404).json({ error });
   }
 }
@@ -56,6 +88,22 @@ const postNewFile = [
     } finally {
       console.log(req.file);
       res.redirect("/");
+    }
+  },
+];
+
+const postNewFileToFolder = [
+  upload.single("file"),
+  async (req, res, next) => {
+    const folderName = req.params[0];
+    try {
+      await query.addNewFileToFolder(req.file, req.user.id, folderName);
+      console.log("Succesfully added file");
+    } catch (err) {
+      console.error("Filed to add new file", err);
+    } finally {
+      console.log(req.file);
+      res.redirect(req.originalUrl);
     }
   },
 ];
@@ -215,12 +263,6 @@ const postCreateFolder = [
       }, {});
 
       return res.status(404).json({ errors: errorMap });
-
-      // return res.render("/", {
-      //   title: "Signup Page",
-      //   formData: req.body,
-      //   errors: errorMap,
-      // });
     }
     const folderName = req.body["folder-name"];
     const userId = req.user.id;
@@ -240,6 +282,7 @@ module.exports = {
   getSharedPage,
 
   postNewFile,
+  postNewFileToFolder,
 
   downloadFile,
   deleteFile,
@@ -254,4 +297,5 @@ module.exports = {
   getPublicFileDownload,
 
   postCreateFolder,
+  getHomePageFolder,
 };
