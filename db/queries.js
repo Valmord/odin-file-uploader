@@ -57,6 +57,22 @@ async function appendFileSizeSingleObj(file) {
   };
 }
 
+async function getUserFolders(userId) {
+  const folders = await prisma.folder.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      folderName: true,
+    },
+    orderBy: {
+      id: "asc",
+    },
+  });
+
+  return folders;
+}
+
 async function getUserFiles(id) {
   const files = await prisma.file.findMany({
     where: {
@@ -338,10 +354,24 @@ async function getPublicShare(shareId) {
   return shareWithSize;
 }
 
+async function createFolder(userId, folderName, parentFolder) {
+  const folder = await prisma.folder.create({
+    data: {
+      folderName,
+      userId,
+    },
+  });
+
+  if (!folder) throw new Error("Couldn't create folder");
+
+  return folder;
+}
+
 module.exports = {
   getUserByUsername,
   createUser,
   addNewFile,
+  getUserFolders,
   getUserFiles,
   getUserSharedFiles,
   downloadFile,
@@ -354,6 +384,7 @@ module.exports = {
 
   putUnlinkSharedFile,
   updatePublicLink,
-
   getPublicShare,
+
+  createFolder,
 };

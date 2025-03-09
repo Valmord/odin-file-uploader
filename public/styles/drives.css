@@ -21,10 +21,21 @@
     margin-right: 20px;
     content: "";
     display: block;
-    background-image: url("/images/file.svg");
     background-size: cover;
     height: 30px;
     width: 30px;
+  }
+
+  & .link-item::before {
+    background-image: url("/images/file.svg");
+  }
+
+  & .link-folder::before {
+    background-image: url("/images/folder.svg");
+  }
+
+  & .link-folder:hover {
+    cursor: pointer;
   }
 }
 

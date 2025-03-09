@@ -27,4 +27,6 @@ router.put("/file/public", pageController.putPublicFileShare);
 router.get("/file/public/:id", pageController.getPublicFileshare);
 router.get("/file/public/download/:id", pageController.getPublicFileDownload);
 
+router.post("/folder/create", pageController.postCreateFolder);
+
 module.exports = router;

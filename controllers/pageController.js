@@ -2,6 +2,7 @@ const multer = require("multer");
 const upload = multer({ dest: "uploads" });
 const query = require("../db/queries");
 const fs = require("fs/promises");
+const { body, validationResult } = require("express-validator");
 
 async function getHomepage(req, res) {
   // console.log(req.user);
@@ -9,15 +10,23 @@ async function getHomepage(req, res) {
     return res.redirect("login");
   }
 
-  const files = await query.getUserFiles(+req.user.id);
+  const userId = +req.user.id;
 
-  res.render("index", {
-    title: "Homepage",
-    user: req.user.username,
-    files,
-    shares: [],
-    activePage: "index",
-  });
+  try {
+    const folders = await query.getUserFolders(userId);
+    const files = await query.getUserFiles(userId);
+    res.render("index", {
+      title: "Homepage",
+      user: req.user.username,
+      folders,
+      files,
+      shares: [],
+      activePage: "index",
+    });
+  } catch (error) {
+    console.error("Error rendering home page", error);
+    res.status(404).json({ error });
+  }
 }
 
 async function getSharedPage(req, res) {
@@ -186,6 +195,46 @@ async function getPublicFileDownload(req, res) {
   }
 }
 
+const postCreateFolder = [
+  [
+    body("folder-name")
+      .notEmpty()
+      .withMessage("Field Required")
+      .isLength({
+        max: 30,
+      })
+      .withMessage("Folders can only be 30 characters long"),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMap = errors.array().reduce((acc, err) => {
+        if (!acc[err.path]) acc[err.path] = [];
+        acc[err.path].push(err.msg);
+        return acc;
+      }, {});
+
+      return res.status(404).json({ errors: errorMap });
+
+      // return res.render("/", {
+      //   title: "Signup Page",
+      //   formData: req.body,
+      //   errors: errorMap,
+      // });
+    }
+    const folderName = req.body["folder-name"];
+    const userId = req.user.id;
+
+    try {
+      const something = await query.createFolder(userId, folderName, null);
+      res.redirect("/");
+    } catch (error) {
+      console.error("Error creating file", error);
+      res.status(404).json({ error });
+    }
+  },
+];
+
 module.exports = {
   getHomepage,
   getSharedPage,
@@ -203,4 +252,6 @@ module.exports = {
   putPublicFileShare,
   getPublicFileshare,
   getPublicFileDownload,
+
+  postCreateFolder,
 };

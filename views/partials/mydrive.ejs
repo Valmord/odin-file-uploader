@@ -5,7 +5,13 @@
     <span>Options</span>
   </div>
   <ul class="drive-container">
-    <% (files || []).forEach( file => { %>
+    <% (folders || []).forEach( folder => { %>
+    <li class="link-folder">
+      <div class="file-details">
+        <span><%= folder.folderName %></span>
+      </div>
+    </li>
+    <% } ) %> <% (files || []).forEach( file => { %>
     <li class="link-item">
       <div class="file-details">
         <span><%= file.originalName %></span>

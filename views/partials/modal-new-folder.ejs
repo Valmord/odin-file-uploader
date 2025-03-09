@@ -1,7 +1,13 @@
 <dialog id="folder-modal">
-  <form action="/new/folder">
+  <form action="/folder/create" method="post">
     <h2>New Folder</h2>
-    <input type="text" name="folder-name" id="folder-name" />
+    <input
+      type="text"
+      name="folder-name"
+      id="folder-name"
+      maxlength="30"
+      required
+    />
     <div class="btn-container">
       <button type="reset" class="cancel-btn">Cancel</button>
       <button type="submit" class="create-btn">Create</button>
