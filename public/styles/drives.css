@@ -33,10 +33,6 @@
   & .link-folder::before {
     background-image: url("/images/folder.svg");
   }
-
-  & .link-folder:hover {
-    cursor: pointer;
-  }
 }
 
 .drive-headers {
@@ -55,14 +51,23 @@
   }
 }
 
-.file-details {
+.file-details,
+.folder-details {
   flex: 1;
   display: flex;
   margin-right: 20px;
   justify-content: space-between;
 }
 
-.file-option-container {
+.folder-details > a {
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.file-option-container,
+.folder-option-container {
   flex: 0 0 100px;
   width: 100px;
   margin-right: 20px;

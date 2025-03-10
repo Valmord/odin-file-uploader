@@ -29,12 +29,23 @@ async function addNewFile({ originalname, filename }, userId) {
 }
 
 async function getFolderFromPath(userId, urlPath) {
+  console.log("Getting path...");
   const folders = urlPath.split("/");
+
+  const decodedFolders = folders.reduce((acc, folder, index) => {
+    if (folder === "") return acc;
+    if (folder === "folder" && index < 2) return acc;
+    acc.push(decodeURIComponent(folder));
+    return acc;
+  }, []);
+
+  // console.log(decodedFolders);
 
   let parentFolderId = null;
   let curFolder = null;
-  for (const folder of folders) {
-    if (folder === "") break;
+  for (const folder of decodedFolders) {
+    console.log("folder name..", folder);
+    console.log(folder);
     const f = await prisma.folder.findFirst({
       where: {
         userId,
@@ -43,13 +54,15 @@ async function getFolderFromPath(userId, urlPath) {
       },
     });
 
+    console.log("F", f);
+
     if (!f) throw new Error("Invalid folder");
 
     parentFolderId = f.id;
     curFolder = f;
   }
 
-  return { folderId: curFolder.id, folderName: curFolder.folderName };
+  return { folderId: curFolder?.id, folderName: curFolder?.folderName };
 }
 
 async function addNewFileToFolder({ originalname, filename }, userId, urlPath) {
@@ -101,9 +114,11 @@ async function getHomepageFolders(userId) {
   const folders = await prisma.folder.findMany({
     where: {
       userId,
+      parentFolderId: null,
     },
     select: {
       folderName: true,
+      id: true,
     },
     orderBy: {
       id: "asc",
@@ -376,11 +391,27 @@ async function getPublicShare(shareId) {
   return shareWithSize;
 }
 
-async function createFolder(userId, folderName, parentFolder) {
+async function createFolder(userId, folderName, parentPath) {
+  console.log("Trying to create folder....");
+  const parentFolder = await getFolderFromPath(userId, parentPath);
+  console.log("PARENT FOLDER", parentFolder);
+
+  const invalidFolderName = await prisma.folder.findFirst({
+    where: {
+      folderName,
+      userId,
+      parentFolderId: parentFolder.folderId,
+    },
+  });
+
+  if (invalidFolderName)
+    throw new Error("Folder of same name and destination exist");
+
   const folder = await prisma.folder.create({
     data: {
       folderName,
       userId,
+      parentFolderId: parentFolder.folderId,
     },
   });
 
@@ -409,13 +440,82 @@ async function getUserFolder(userId, urlPath) {
     },
   });
 
+  console.log(otherFolders);
+
   const files = await appendFileSizeArray(folderContents[0].files);
+
+  // const test = await prisma.folder.findMany({
+  //   where: {
+  //     id: folderId,
+  //     userId,
+  //   },
+  //   select: {
+  //     files: {
+  //       select: {
+  //         originalName: true,
+  //         id: true,
+  //         filename: true,
+  //       },
+  //     },
+  //   },
+  // });
 
   return {
     files,
     folders: otherFolders,
     currentFolder: folderName,
   };
+}
+
+async function reconstructPath(folder, userId) {
+  const urlArray = [folder.folderName];
+
+  console.log("Folder starts here", folder);
+
+  let currentFolder = folder;
+  while (true) {
+    if (!currentFolder.parentFolderId) break;
+    const parentFolder = await prisma.folder.findUnique({
+      where: {
+        userId,
+        id: currentFolder.parentFolderId,
+      },
+      select: {
+        folderName: true,
+        parentFolderId: true,
+      },
+    });
+
+    console.log("Folder..", parentFolder);
+
+    if (!parentFolder) break;
+
+    currentFolder = parentFolder;
+    urlArray.unshift(currentFolder.folderName);
+  }
+
+  return urlArray.join("/");
+}
+
+async function deleteFolder(folderId, userId) {
+  const validFolder = await prisma.folder.findUnique({
+    where: {
+      id: folderId,
+      userId,
+    },
+  });
+
+  if (!validFolder)
+    throw new Error("Invalid folder or Invalid user permissions");
+
+  const folder = await prisma.folder.delete({
+    where: {
+      id: folderId,
+      userId,
+    },
+  });
+
+  console.log(`folder deleted`, folder);
 }
 
 module.exports = {
@@ -442,4 +542,7 @@ module.exports = {
 
   createFolder,
   getUserFolder,
+
+  reconstructPath,
+  deleteFolder,
 };

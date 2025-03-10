@@ -7,12 +7,19 @@
   <ul class="drive-container">
     <% (folders || []).forEach( folder => { %>
     <li class="link-folder">
-      <div class="file-details">
-        <span
-          ><a href="folder/<%= folder.folderName %>"
-            ><%= folder.folderName %></a
-          ></span
+      <div class="folder-details">
+        <a href="../folder/<%= folder.folderName %>" class="folder-link"
+          ><%= folder.folderName %></a
         >
+      </div>
+      <div class="folder-option-container">
+        <a href="/folder/delete/<%= folder.id %>">
+          <img
+            src="/images/delete-folder.svg"
+            alt="delete"
+            class="delete-folder"
+          />
+        </a>
       </div>
     </li>
     <% } ) %> <% (files || []).forEach( file => { %>

@@ -2,6 +2,12 @@
   <form action="/folder/create" method="post">
     <h2>New Folder</h2>
     <input
+      type="hidden"
+      name="path"
+      id="hidden-path-input"
+      aria-hidden="true"
+    />
+    <input
       type="text"
       name="folder-name"
       id="folder-name"

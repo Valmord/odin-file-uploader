@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
+    // Adding new File
     addFileBtn.addEventListener("click", () => {
       const input = document.createElement("input");
       input.type = "file";
@@ -53,10 +54,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
+    // Adding new Folder
     const folderModal = document.getElementById("folder-modal");
     const folderModalCancelBtn = folderModal.querySelector(".cancel-btn");
+    const pathInput = document.getElementById("hidden-path-input");
 
     addFolderBtn.addEventListener("click", () => {
+      pathInput.value = window.location.pathname;
       folderModal.showModal();
     });
 

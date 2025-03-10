@@ -4,16 +4,29 @@ const query = require("../db/queries");
 const fs = require("fs/promises");
 const { body, validationResult } = require("express-validator");
 
-async function getHomepage(req, res) {
-  // console.log(req.user);
-  if (!req.user) {
-    return res.redirect("login");
+function authenticateUser(req, res, next) {
+  console.log(req.user);
+  if (
+    req.path === "/login" ||
+    req.path === "/signup" ||
+    req.path === "/login2"
+  ) {
+    // Allow these routes to proceed
+    return next();
   }
+  if (!req.user) {
+    // Assuming you store user ID in session
+    return res.redirect("/login");
+  }
+  next();
+}
 
+async function getHomepage(req, res) {
   const userId = +req.user.id;
 
   try {
     const folders = await query.getHomepageFolders(userId);
+    console.log(folders);
     const files = await query.getUserFiles(userId);
     res.render("index", {
       title: "Homepage",
@@ -25,19 +38,11 @@ async function getHomepage(req, res) {
     });
   } catch (error) {
     console.error("Error rendering home page", error);
-    res.status(404).json({ error });
+    res.status(404).json({ error: error.message });
   }
 }
 
 async function getHomePageFolder(req, res) {
-  if (!req.user) {
-    return res.redirect("login");
-  }
-
-  console.log(req.params);
-
-  // const path = req.params
-
   const userId = +req.user.id;
   const url = req.params[0];
 
@@ -57,7 +62,7 @@ async function getHomePageFolder(req, res) {
     });
   } catch (error) {
     console.error("Error getting folders for home page", error);
-    res.status(404).json({ error });
+    res.status(404).json({ error: error.message });
   }
 }
 
@@ -183,11 +188,11 @@ async function postShareWithUser(req, res) {
       req.body.fileId,
       req.user.id
     );
-    console.log("Succesfully shared with user");
+    console.log("Successfully shared with user");
     res.json({ message: `Succesfully shared with ${req.body.username}` });
-  } catch (err) {
-    console.error(`Error sharing with user ${req.body.username}`, err);
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    console.error(`Error sharing with user ${req.body.username}`, error);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -198,9 +203,9 @@ async function unshareShare(req, res) {
   try {
     await query.putUnlinkSharedFile(fileId, userId);
     res.status(200).json({ message: "Successfully unlinked file" });
-  } catch (err) {
-    console.log(err);
-    res.status(404).json({ error: err });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ error: error.message });
   }
 }
 
@@ -213,7 +218,7 @@ async function putPublicFileShare(req, res) {
     res.json({ link });
   } catch (error) {
     console.error(`Error updating file ${fileId}`, error);
-    res.status(404).json({ error });
+    res.status(404).json({ error: error.message });
   }
 }
 
@@ -227,7 +232,7 @@ async function getPublicFileshare(req, res) {
     res.render("public-share", { title: "Download file", ...shared });
   } catch (error) {
     console.error("In error occurred getting Public Fileshare", error);
-    res.status(404).json({ error });
+    res.status(404).json({ error: error.message });
   }
 }
 
@@ -239,7 +244,7 @@ async function getPublicFileDownload(req, res) {
     res.download(`./uploads/${file.filename}`, file.originalName);
   } catch (error) {
     console.error("Error downloading file", shareId);
-    res.status(404).json({ error });
+    res.status(404).json({ error: error.message });
   }
 }
 
@@ -266,18 +271,38 @@ const postCreateFolder = [
     }
     const folderName = req.body["folder-name"];
     const userId = req.user.id;
+    const path = req.body.path;
 
     try {
-      const something = await query.createFolder(userId, folderName, null);
-      res.redirect("/");
+      const folder = await query.createFolder(userId, folderName, path);
+      const newUrl = await query.reconstructPath(folder, userId);
+      console.log(newUrl);
+      res.redirect(newUrl);
     } catch (error) {
       console.error("Error creating file", error);
-      res.status(404).json({ error });
+      res.status(404).json({ error: error.message });
     }
   },
 ];
 
+async function deleteFolder(req, res) {
+  const folderId = +req.params.id;
+  const userId = req.user.id;
+
+  console.log("FOLDER ID", folderId);
+
+  try {
+    await query.deleteFolder(folderId, userId);
+    console.log("Successfully deleted folder");
+    res.status(200).json({ message: "Successfully deleted folder" });
+  } catch (error) {
+    console.error("Error deleting folder: ", error);
+    res.status(404).json({ error: error.message });
+  }
+}
+
 module.exports = {
+  authenticateUser,
   getHomepage,
   getSharedPage,
 
@@ -298,4 +323,5 @@ module.exports = {
 
   postCreateFolder,
   getHomePageFolder,
+  deleteFolder,
 };

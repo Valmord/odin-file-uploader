@@ -30,5 +30,6 @@ router.get("/file/public/download/:id", pageController.getPublicFileDownload);
 router.post("/folder/create", pageController.postCreateFolder);
 router.get("/folder/*", pageController.getHomePageFolder);
 router.post("/folder/*", pageController.postNewFileToFolder);
+router.delete("/folder/delete/:id", pageController.deleteFolder);
 
 module.exports = router;

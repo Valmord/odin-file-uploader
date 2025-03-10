@@ -1,8 +1,52 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const deleteBtns = document.querySelectorAll(".delete-file");
+  const folders = document.querySelectorAll(".folder-link");
 
-  if (deleteBtns) {
-    deleteBtns.forEach((btn) => {
+  if (folders) {
+    folders.forEach((folder) => {
+      const path = window.location.pathname;
+      if (path !== "/") {
+        const newUrl = `${path}/${folder.textContent}`;
+        folder.href = newUrl;
+      }
+    });
+  }
+
+  const delFolderBtns = document.querySelectorAll(".delete-folder");
+
+  if (delFolderBtns) {
+    delFolderBtns.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const isConfirmed = confirm(
+          "Are you sure you wish to delete this folder?\n(All files will be deleted as well)"
+        );
+        if (!isConfirmed) {
+          return;
+        }
+
+        const response = await fetch(btn.parentNode.href, {
+          headers: {
+            "Content-Type": "json/application",
+          },
+          method: "Delete",
+        });
+
+        console.log(response);
+
+        if (response.ok) {
+          console.log("Folder successfully deleted");
+          window.location.reload();
+        } else {
+          alert("Failed to delete folder");
+        }
+      });
+    });
+  }
+
+  const delFileBtns = document.querySelectorAll(".delete-file");
+
+  if (delFileBtns) {
+    delFileBtns.forEach((btn) => {
       btn.addEventListener("click", async (e) => {
         e.preventDefault();
         const userConfirmation = confirm(

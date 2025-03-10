@@ -13,6 +13,7 @@ const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 
 // Local modules
 const pageRouter = require("./routes/pageRouter");
+const pageController = require("./controllers/pageController");
 
 // Initialize app
 const app = express();
@@ -107,6 +108,7 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+app.use(pageController.authenticateUser);
 app.use("/", pageRouter);
 
 app.listen(PORT, () => {
