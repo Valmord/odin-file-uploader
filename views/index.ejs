@@ -19,8 +19,8 @@
       <main>
         <div class="content">
           <h2><%= title %></h2>
-          <% if ( activePage === 'index' && files.length) { %> <%-
-          include('./partials/mydrive') %> <% } else if ( activePage ===
+          <% if ( activePage === 'index' && (files.length || folders.length)) {
+          %> <%- include('./partials/mydrive') %> <% } else if ( activePage ===
           'shares' && shares.length ) { %> <%-
           include('./partials/myshared.ejs') %> <% } else { %>
           <h3 class="no-files">No Files Yet :)</h3>

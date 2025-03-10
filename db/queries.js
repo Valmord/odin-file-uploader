@@ -29,7 +29,6 @@ async function addNewFile({ originalname, filename }, userId) {
 }
 
 async function getFolderFromPath(userId, urlPath) {
-  console.log("Getting path...");
   const folders = urlPath.split("/");
 
   const decodedFolders = folders.reduce((acc, folder, index) => {
@@ -44,8 +43,6 @@ async function getFolderFromPath(userId, urlPath) {
   let parentFolderId = null;
   let curFolder = null;
   for (const folder of decodedFolders) {
-    console.log("folder name..", folder);
-    console.log(folder);
     const f = await prisma.folder.findFirst({
       where: {
         userId,
@@ -67,9 +64,6 @@ async function getFolderFromPath(userId, urlPath) {
 
 async function addNewFileToFolder({ originalname, filename }, userId, urlPath) {
   const { folderId } = await getFolderFromPath(userId, urlPath);
-
-  console.log("FOLDER ID");
-  console.log(folderId);
 
   await prisma.file.create({
     data: {
@@ -320,16 +314,12 @@ async function postShareWithUser(sharedUsername, fileId, userId) {
 
 // From the Shared User
 async function putUnlinkSharedFile(fileId, userId) {
-  console.log("in here with", fileId, userId);
-
   const fileShared = await prisma.sharedFile.findFirst({
     where: {
       fileId,
       userId,
     },
   });
-
-  console.log(fileShared);
 
   if (!fileShared) throw new Error("File doesn't exist");
 
@@ -344,7 +334,6 @@ async function putUnlinkSharedFile(fileId, userId) {
 }
 
 async function updatePublicLink(fileId, userId) {
-  console.log(fileId, userId);
   const validUser = await prisma.file.findUnique({
     where: {
       id: fileId,
@@ -386,15 +375,12 @@ async function getPublicShare(shareId) {
   if (!share) throw new Error("Invalid share id");
 
   const shareWithSize = await appendFileSizeSingleObj(share);
-  console.log(shareWithSize);
 
   return shareWithSize;
 }
 
 async function createFolder(userId, folderName, parentPath) {
-  console.log("Trying to create folder....");
   const parentFolder = await getFolderFromPath(userId, parentPath);
-  console.log("PARENT FOLDER", parentFolder);
 
   const invalidFolderName = await prisma.folder.findFirst({
     where: {
@@ -440,25 +426,9 @@ async function getUserFolder(userId, urlPath) {
     },
   });
 
-  console.log(otherFolders);
+  // console.log(otherFolders);
 
   const files = await appendFileSizeArray(folderContents[0].files);
-
-  // const test = await prisma.folder.findMany({
-  //   where: {
-  //     id: folderId,
-  //     userId,
-  //   },
-  //   select: {
-  //     files: {
-  //       select: {
-  //         originalName: true,
-  //         id: true,
-  //         filename: true,
-  //       },
-  //     },
-  //   },
-  // });
 
   return {
     files,
@@ -469,8 +439,6 @@ async function getUserFolder(userId, urlPath) {
 
 async function reconstructPath(folder, userId) {
   const urlArray = [folder.folderName];
-
-  console.log("Folder starts here", folder);
 
   let currentFolder = folder;
   while (true) {
@@ -518,6 +486,48 @@ async function deleteFolder(folderId, userId) {
   console.log(`folder deleted`, folder);
 }
 
+async function getSearchedFiles(userId, search) {
+  const files = await prisma.file.findMany({
+    where: {
+      userId,
+      originalName: {
+        contains: search,
+        mode: "insensitive",
+      },
+    },
+    select: {
+      filename: true,
+      originalName: true,
+      id: true,
+    },
+  });
+
+  let filesWithSizes = [];
+  if (files) {
+    filesWithSizes = appendFileSizeArray(files);
+  }
+
+  return filesWithSizes;
+}
+
+async function getSearchedFolders(userId, search) {
+  const folders = await prisma.folder.findMany({
+    where: {
+      userId,
+      folderName: {
+        contains: search,
+        mode: "insensitive",
+      },
+    },
+    select: {
+      folderName: true,
+      id: true,
+    },
+  });
+
+  return folders || [];
+}
+
 module.exports = {
   getUserByUsername,
   createUser,
@@ -545,4 +555,7 @@ module.exports = {
 
   reconstructPath,
   deleteFolder,
+
+  getSearchedFiles,
+  getSearchedFolders,
 };

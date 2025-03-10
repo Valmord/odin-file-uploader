@@ -58,3 +58,11 @@ header {
     text-decoration: none;
   }
 }
+
+#search-btn {
+  cursor: pointer;
+  appearance: none;
+  padding: 0;
+  bottom: auto;
+  border: none;
+}

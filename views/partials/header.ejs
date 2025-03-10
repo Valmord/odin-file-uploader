@@ -1,10 +1,13 @@
 <header>
   <h1><a href="/">MyDrive</a></h1>
 
-  <div class="search-bar">
-    <img src="/images/magnifying-glass.svg" alt="" aria-hidden="true" />
-    <input type="text" placeholder="Search MyDrive" />
-  </div>
+  <form action="/search" method="get" class="search-bar">
+    <button type="submit" id="search-btn">
+      <img src="/images/magnifying-glass.svg" alt="search-btn" role="button" />
+    </button>
+
+    <input type="text" name="q" placeholder="Search MyDrive" />
+  </form>
   <div class="links-container">
     <a href="/logout">Logout</a>
     <a href="/"><%= user %></a>

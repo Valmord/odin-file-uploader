@@ -29,29 +29,4 @@ document.addEventListener("DOMContentLoaded", () => {
   if (passwordInput) {
     passwordInput.focus();
   }
-
-  // const nextPage = async function () {
-  //   const response = await fetch("/login", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       username: userInput.value,
-  //     }),
-
-  //   });
-  // };
-
-  // nextBtn.addEventListener("click", () => {
-  //   if (userInput.validity.valid) {
-  //     nextPage();
-  //   }
-  // });
-
-  // userInput.addEventListener("keypress", (e) => {
-  //   if (e.key === "Enter" && userInput.validity.valid) {
-  //     nextPage();
-  //   }
-  // });
 });

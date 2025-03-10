@@ -5,7 +5,6 @@ const fs = require("fs/promises");
 const { body, validationResult } = require("express-validator");
 
 function authenticateUser(req, res, next) {
-  console.log(req.user);
   if (
     req.path === "/login" ||
     req.path === "/signup" ||
@@ -42,6 +41,28 @@ async function getHomepage(req, res) {
   }
 }
 
+async function getSearchResults(req, res) {
+  const userId = +req.user.id;
+  const search = req.query.q;
+
+  try {
+    const files = await query.getSearchedFiles(userId, search);
+    const folders = await query.getSearchedFolders(userId, search);
+
+    res.render("index", {
+      title: `Search: ${search}`,
+      user: req.user.username,
+      folders,
+      files,
+      shares: [],
+      activePage: "index",
+    });
+  } catch (error) {
+    console.error("Error rendering home page", error);
+    res.status(404).json({ error: error.message });
+  }
+}
+
 async function getHomePageFolder(req, res) {
   const userId = +req.user.id;
   const url = req.params[0];
@@ -51,7 +72,6 @@ async function getHomePageFolder(req, res) {
       userId,
       url
     );
-    // console.log(folderData);
     res.render("index", {
       title: currentFolder,
       user: req.user.username,
@@ -148,7 +168,6 @@ async function deleteFile(req, res) {
 
   const deleteFile = async (fileName) => {
     const path = `./uploads/${fileName}`;
-    console.log(path);
     await fs.rm(path);
   };
 
@@ -168,8 +187,6 @@ async function getSharedFileInfo(req, res) {
   const fileId = +req.params.id;
   const userId = req.user.id;
 
-  console.log("in here");
-
   try {
     const sharedInfo = await query.getSharedFileInfo(fileId, userId);
     res.json({ sharedInfo });
@@ -180,15 +197,12 @@ async function getSharedFileInfo(req, res) {
 }
 
 async function postShareWithUser(req, res) {
-  console.log(req.body);
-
   try {
     await query.postShareWithUser(
       req.body.username,
       req.body.fileId,
       req.user.id
     );
-    console.log("Successfully shared with user");
     res.json({ message: `Succesfully shared with ${req.body.username}` });
   } catch (error) {
     console.error(`Error sharing with user ${req.body.username}`, error);
@@ -224,11 +238,8 @@ async function putPublicFileShare(req, res) {
 
 async function getPublicFileshare(req, res) {
   const shareId = req.params.id;
-  console.log(shareId);
-
   try {
     const shared = await query.getPublicShare(shareId);
-    console.log(shared);
     res.render("public-share", { title: "Download file", ...shared });
   } catch (error) {
     console.error("In error occurred getting Public Fileshare", error);
@@ -276,7 +287,6 @@ const postCreateFolder = [
     try {
       const folder = await query.createFolder(userId, folderName, path);
       const newUrl = await query.reconstructPath(folder, userId);
-      console.log(newUrl);
       res.redirect(newUrl);
     } catch (error) {
       console.error("Error creating file", error);
@@ -288,8 +298,6 @@ const postCreateFolder = [
 async function deleteFolder(req, res) {
   const folderId = +req.params.id;
   const userId = req.user.id;
-
-  console.log("FOLDER ID", folderId);
 
   try {
     await query.deleteFolder(folderId, userId);
@@ -324,4 +332,5 @@ module.exports = {
   postCreateFolder,
   getHomePageFolder,
   deleteFolder,
+  getSearchResults,
 };

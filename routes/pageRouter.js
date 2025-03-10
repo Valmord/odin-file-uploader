@@ -32,4 +32,6 @@ router.get("/folder/*", pageController.getHomePageFolder);
 router.post("/folder/*", pageController.postNewFileToFolder);
 router.delete("/folder/delete/:id", pageController.deleteFolder);
 
+router.get("/search/", pageController.getSearchResults);
+
 module.exports = router;

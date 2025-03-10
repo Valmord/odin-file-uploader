@@ -81,7 +81,7 @@ ul {
     margin-left: -15px;
     margin-right: 10px;
     content: "—";
-    color: red;
+    color: #ff0000;
   }
 
   & li {
